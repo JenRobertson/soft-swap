@@ -76,6 +76,11 @@ function drawCoins(){
 			}
 
 			drawCoin(coin);
+			if(shouldBreak(coinLayout, column, row)){
+				ctx.rect(coinLayout[column][row].x, coinLayout[column][row].y, COIN_WIDTH, COIN_WIDTH);
+				ctx.stroke();
+				ctx.lineWidth=3;
+			}
 		}
 	}
 }
@@ -127,16 +132,30 @@ function shouldBreak(coinLayout, column, row){
 	if (coinLayout[column - 1] && (coinLayout[column - 1][row].id === coin.id)){//1 left
 		if(coinLayout[column - 2] && (coinLayout[column - 2][row].id === coin.id)){//2 left
 			return true;
-			// drawCircle(coinLayout[column - 1][row]);
-			// drawCircle(coinLayout[column - 2][row]);	
+		}
+		if (coinLayout[column + 1] && (coinLayout[column + 1][row].id === coin.id)){//1 right
+			return true;
 		}
 	}
 
 	if (coinLayout[column][row - 1] && (coinLayout[column][row - 1].id === coin.id)){//1 up
 		if (coinLayout[column][row - 2] && (coinLayout[column][row - 2].id === coin.id)){//2 up
 			return true;
-			// drawCircle(coinLayout[column][row - 1]);
-			// drawCircle(coinLayout[column][row - 2]);	
+		}
+		if (coinLayout[column][row + 1] && (coinLayout[column][row + 1].id === coin.id)){//1 down
+			return true;
+		}
+	}
+
+	if (coinLayout[column + 1] && (coinLayout[column + 1][row].id === coin.id)){//1 right
+		if(coinLayout[column + 2] && (coinLayout[column + 2][row].id === coin.id)){//2 right
+			return true;
+		}
+	}
+
+	if (coinLayout[column][row + 1] && (coinLayout[column][row + 1].id === coin.id)){//1 down
+		if (coinLayout[column][row + 2] && (coinLayout[column][row + 2].id === coin.id)){//2 down
+			return true;
 		}
 	}
 }
@@ -144,14 +163,12 @@ function shouldBreak(coinLayout, column, row){
 function frame(){
 	ctx.clearRect(0, 0, c.width, c.height);
 	drawCoins();
-
 	var xCalc = Math.round(cursorX/WIDTH_AND_PADDING) * WIDTH_AND_PADDING - WIDTH_AND_PADDING;
 	var yCalc = Math.round(cursorY/WIDTH_AND_PADDING) * WIDTH_AND_PADDING - WIDTH_AND_PADDING;
-		console.log(xCalc);
-		ctx.beginPath();
-		ctx.rect(xCalc, yCalc, COIN_WIDTH * 2, COIN_WIDTH);
-		ctx.stroke();
-		ctx.lineWidth=3;
+	ctx.beginPath();
+	ctx.rect(xCalc, yCalc, COIN_WIDTH * 2, COIN_WIDTH);
+	ctx.stroke();
+	ctx.lineWidth=3;
 
 	window.requestAnimationFrame(frame);
 }
