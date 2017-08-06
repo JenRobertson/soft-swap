@@ -1,15 +1,49 @@
-
-
 var COIN_PADDING = 2;
 var COIN_WIDTH = 50;
+var WIDTH_AND_PADDING = COIN_WIDTH + COIN_PADDING;
 var COINS_PER_LINE = 10;
+var SWAP_SPEED = 3;
+
+var ctx;
+var c;
+var coinLayout;
+var cursorX;
+var cursorY;
+
 
 window.onload = function () { 
-	var c = document.getElementById("myCanvas");
-	var ctx = c.getContext("2d");
-	
-	var coinLayout = generateCoinsArray();
-	drawCoins(coinLayout);
+	c = document.getElementById("myCanvas");
+	ctx = c.getContext("2d");
+
+	c.onmousemove = function(e){
+	    cursorX = e.pageX;
+	    cursorY = e.pageY;
+	}
+
+	c.onclick = function(){
+		swapCoins();
+	}
+
+	coinLayout = generateCoinsArray();
+	drawCoins();
+
+	window.requestAnimationFrame(frame);
+}
+
+function swapCoins(){
+	var column = Math.round(cursorX/WIDTH_AND_PADDING);
+	var row = Math.round(cursorY/WIDTH_AND_PADDING)-1;
+
+	var leftCoin = coinLayout[column-1] && coinLayout[column-1][row];
+	var rightCoin = coinLayout[column] && coinLayout[column][row];
+
+	if(leftCoin && rightCoin){
+		rightCoin.newX-= WIDTH_AND_PADDING;
+		leftCoin.newX+= WIDTH_AND_PADDING;
+
+		coinLayout[column][row]= leftCoin;
+		coinLayout[column-1][row]= rightCoin;
+	}
 }
 
 function generateCoinsArray(){
@@ -23,51 +57,65 @@ function generateCoinsArray(){
 
 			while (shouldBreak(coinLayout, column, row)){
 				coinLayout[column][row] = getCoin(column, row);
-				//drawCircle(coinLayout[column][row]);
 			}
 		}
 	}
 	return coinLayout;
 }
 
-function drawCoins(coinLayout){
+function drawCoins(){
 	for (column = 0; column < COINS_PER_LINE; column++) { 
-		for (row = 0; row < COINS_PER_LINE; row++) { 
-			var coin = coinLayout[column][row];
-			ctx.drawImage(coin.img, coin.x, coin.y);
+		for (row = 0; row < COINS_PER_LINE; row++) {
 
+			var coin = coinLayout[column][row];
+			if(coin.x <= coin.newX ){
+				coin.x += SWAP_SPEED;
+			}
+			if(coin.x >= coin.newX){
+				coin.x -= SWAP_SPEED;
+			}
+
+			drawCoin(coin);
 		}
 	}
 }
 
 function getCoin(column, row){
-	var x = COIN_PADDING + (COIN_WIDTH + COIN_PADDING) * column;
-	var y = COIN_PADDING + (COIN_WIDTH + COIN_PADDING) * row;
+	var x = COIN_PADDING + WIDTH_AND_PADDING * column;
+	var y = COIN_PADDING + WIDTH_AND_PADDING * row;
 	var coins = 
 	[
 		{
 			id: 1,
 			img: document.getElementById("coin1"),
 			x,
-			y
+			y,
+			newX: x,
+			newY: y
 		},
 		{
 			id: 2,
 			img: document.getElementById("coin2"),
 			x,
-			y
+			y,
+			newX: x,
+			newY: y
 		},
 		{
 			id: 3,
 			img: document.getElementById("coin3"),
 			x,
-			y
+			y,
+			newX: x,
+			newY: y
 		},
 		{
 			id: 4,
 			img: document.getElementById("coin4"),
 			x,
-			y
+			y,
+			newX: x,
+			newY: y
 		},
 	];
 	var rand = Math.floor((Math.random() * coins.length) + 0);
@@ -93,10 +141,21 @@ function shouldBreak(coinLayout, column, row){
 	}
 }
 
-function drawCircle(coin){
-	var circleSize = COIN_WIDTH/2;
-	ctx.beginPath();
-	ctx.arc(coin.x + circleSize, coin.y + circleSize, circleSize + 3,0,2*Math.PI);
-	ctx.lineWidth=10;
-	ctx.stroke();
+function frame(){
+	ctx.clearRect(0, 0, c.width, c.height);
+	drawCoins();
+
+	var xCalc = Math.round(cursorX/WIDTH_AND_PADDING) * WIDTH_AND_PADDING - WIDTH_AND_PADDING;
+	var yCalc = Math.round(cursorY/WIDTH_AND_PADDING) * WIDTH_AND_PADDING - WIDTH_AND_PADDING;
+		console.log(xCalc);
+		ctx.beginPath();
+		ctx.rect(xCalc, yCalc, COIN_WIDTH * 2, COIN_WIDTH);
+		ctx.stroke();
+		ctx.lineWidth=3;
+
+	window.requestAnimationFrame(frame);
+}
+
+function drawCoin(coin){
+	ctx.drawImage(coin.img, coin.x, coin.y);
 }
