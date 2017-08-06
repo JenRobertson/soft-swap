@@ -81,37 +81,31 @@ function drawCoins(){
 
 			var coin = coinLayout[column][row];
 
-			if(coin.x < coin.newX ){
-				coin.x += SWAP_SPEED;
-			}
-			if(coin.x > coin.newX){
-				coin.x -= SWAP_SPEED;
-			}
-			if(coin.y > coin.newY ){
-				coin.y -= SWAP_SPEED;
-			}
-			if(coin.y < coin.newY){
-				coin.y += SWAP_SPEED;
+			if(!coin.broken){
+
+				if(coin.x < coin.newX ){
+					coin.x += SWAP_SPEED;
+				}
+				if(coin.x > coin.newX){
+					coin.x -= SWAP_SPEED;
+				}
+				if(coin.y > coin.newY ){
+					coin.y -= SWAP_SPEED;
+				}
+				if(coin.y < coin.newY){
+					coin.y += SWAP_SPEED;
+				}
+
+				drawCoin(coin);
 			}
 
-			drawCoin(coin);
+
 		}
 	}
 }
 
-function breakCoin(old_column, old_row){
-	coinLayout[old_column][old_row].img= '';
-
-	for (row = old_row; row < COINS_PER_LINE; row++) {
-
-		if(coinLayout[column][row + 1]){
-			//bottomCoin = coinLayout[column][row + 1];
-
-			// coinLayout[column][row] = bottomCoin;
-			// coinLayout[column][row].img= '';
-			// coinLayout[column][row].newY-= WIDTH_AND_PADDING;
-		}
-	}
+function breakCoin(column, row){
+	coinLayout[column][row].broken= true;
 
 }
 
@@ -126,7 +120,8 @@ function getCoin(column, row){
 			x,
 			y,
 			newX: x,
-			newY: y
+			newY: y,
+			broken: false
 		},
 		{
 			id: 2,
@@ -134,7 +129,8 @@ function getCoin(column, row){
 			x,
 			y,
 			newX: x,
-			newY: y
+			newY: y,
+			broken: false
 		},
 		{
 			id: 3,
@@ -142,7 +138,8 @@ function getCoin(column, row){
 			x,
 			y,
 			newX: x,
-			newY: y
+			newY: y,
+			broken: false
 		},
 		{
 			id: 4,
@@ -150,7 +147,8 @@ function getCoin(column, row){
 			x,
 			y,
 			newX: x,
-			newY: y
+			newY: y,
+			broken: false
 		},
 	];
 	var rand = Math.floor((Math.random() * coins.length) + 0);
