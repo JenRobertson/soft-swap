@@ -22,6 +22,8 @@ window.onload = function () {
 
 	c.onclick = function(){
 		swapCoins();
+		checkForBreaks();
+		console.log(coinLayout[0]);
 	}
 
 	coinLayout = generateCoinsArray();
@@ -43,6 +45,16 @@ function swapCoins(){
 
 		coinLayout[column][row]= leftCoin;
 		coinLayout[column-1][row]= rightCoin;
+	}
+}
+
+function checkForBreaks(){
+	for (column = 0; column < COINS_PER_LINE; column++) {
+		for (row = 0; row < COINS_PER_LINE; row++) { 
+			if(shouldBreak(coinLayout, column, row)){
+				breakCoin(column, row);
+			}
+		}
 	}
 }
 
@@ -68,21 +80,39 @@ function drawCoins(){
 		for (row = 0; row < COINS_PER_LINE; row++) {
 
 			var coin = coinLayout[column][row];
-			if(coin.x <= coin.newX ){
+
+			if(coin.x < coin.newX ){
 				coin.x += SWAP_SPEED;
 			}
-			if(coin.x >= coin.newX){
+			if(coin.x > coin.newX){
 				coin.x -= SWAP_SPEED;
+			}
+			if(coin.y > coin.newY ){
+				coin.y -= SWAP_SPEED;
+			}
+			if(coin.y < coin.newY){
+				coin.y += SWAP_SPEED;
 			}
 
 			drawCoin(coin);
-			if(shouldBreak(coinLayout, column, row)){
-				ctx.rect(coinLayout[column][row].x, coinLayout[column][row].y, COIN_WIDTH, COIN_WIDTH);
-				ctx.stroke();
-				ctx.lineWidth=3;
-			}
 		}
 	}
+}
+
+function breakCoin(old_column, old_row){
+	coinLayout[old_column][old_row].img= '';
+
+	for (row = old_row; row < COINS_PER_LINE; row++) {
+
+		if(coinLayout[column][row + 1]){
+			//bottomCoin = coinLayout[column][row + 1];
+
+			// coinLayout[column][row] = bottomCoin;
+			// coinLayout[column][row].img= '';
+			// coinLayout[column][row].newY-= WIDTH_AND_PADDING;
+		}
+	}
+
 }
 
 function getCoin(column, row){
@@ -174,5 +204,7 @@ function frame(){
 }
 
 function drawCoin(coin){
-	ctx.drawImage(coin.img, coin.x, coin.y);
+	if(coin.img){
+		ctx.drawImage(coin.img, coin.x, coin.y);
+	}
 }
