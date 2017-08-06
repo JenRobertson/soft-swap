@@ -56,6 +56,15 @@ function checkForBreaks(){
 			}
 		}
 	}
+	moveCoinsUp();
+}
+
+function moveCoinsUp(){
+	for (row = 0; row < COINS_PER_LINE; row++) {
+		coinLayout[0][row] = coinLayout[0][row + 1];
+
+	}
+	console.log(coinLayout)
 }
 
 function generateCoinsArray(){
@@ -81,7 +90,7 @@ function drawCoins(){
 
 			var coin = coinLayout[column][row];
 
-			if(!coin.broken){
+			if(coin && !coin.broken){
 
 				if(coin.x < coin.newX ){
 					coin.x += SWAP_SPEED;
@@ -98,14 +107,13 @@ function drawCoins(){
 
 				drawCoin(coin);
 			}
-
-
 		}
 	}
 }
 
 function breakCoin(column, row){
 	coinLayout[column][row].broken= true;
+
 
 }
 
