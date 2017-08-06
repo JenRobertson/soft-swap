@@ -53,18 +53,24 @@ function checkForBreaks(){
 		for (row = 0; row < COINS_PER_LINE; row++) { 
 			if(shouldBreak(coinLayout, column, row)){
 				breakCoin(column, row);
+	
 			}
 		}
 	}
-	moveCoinsUp();
+
 }
 
-function moveCoinsUp(){
-	for (row = 0; row < COINS_PER_LINE; row++) {
-		coinLayout[0][row] = coinLayout[0][row + 1];
-
-	}
-	console.log(coinLayout)
+function moveRowUp(column, row){
+	// for (row = row; row < COINS_PER_LINE; row++) {
+	// 	coinLayout[column][COINS_PER_LINE + 1] = getCoin();
+	// 	console.log('column', column);
+	// 	console.log('row',row + 1);
+	// 	if(row + 1 < 10){
+	// 		// coinLayout[column][row + 1].newX = coinLayout[column][row].x; 
+	// 		// coinLayout[column][row + 1].newY = coinLayout[column][row].y;
+	// 		coinLayout[column][row] = coinLayout[column][row + 1];
+	// 	}
+	// }
 }
 
 function generateCoinsArray(){
@@ -112,9 +118,14 @@ function drawCoins(){
 }
 
 function breakCoin(column, row){
-	coinLayout[column][row].broken= true;
-
-
+	coinLayout[column][row].broken = true;
+	// if (row > -1) {
+	// 	console.log(coinLayout[column]);
+ //   		coinLayout[column].splice(row, 1);
+ //   		console.log(coinLayout[column]);
+	// }
+	// coinLayout[column][9] = getCoin();
+	// //console.log(coinLayout);
 }
 
 function getCoin(column, row){
