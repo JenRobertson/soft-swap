@@ -2,7 +2,7 @@ var COIN_PADDING = 2;
 var COIN_WIDTH = 50;
 var WIDTH_AND_PADDING = COIN_WIDTH + COIN_PADDING;
 var COINS_PER_LINE = 10;
-var SWAP_SPEED = 3;
+var SWAP_SPEED = 5;
 
 var ctx;
 var c;
@@ -11,7 +11,7 @@ var cursorX;
 var cursorY;
 
 
-window.onload = function () { 
+window.onload = function () {
 	c = document.getElementById("myCanvas");
 	ctx = c.getContext("2d");
 
@@ -23,13 +23,31 @@ window.onload = function () {
 	c.onclick = function(){
 		swapCoins();
 		checkForBreaks();
-		console.log(coinLayout[0]);
 	}
 
 	coinLayout = generateCoinsArray();
-	drawCoins();
 
 	window.requestAnimationFrame(frame);
+}
+
+
+function frame(){
+	ctx.clearRect(0, 0, c.width, c.height);
+
+	drawCoins(coinLayout);
+	drawSelector();
+
+
+	window.requestAnimationFrame(frame);
+}
+
+function drawSelector(){
+	var xCalc = Math.round(cursorX/WIDTH_AND_PADDING) * WIDTH_AND_PADDING - WIDTH_AND_PADDING;
+	var yCalc = Math.round(cursorY/WIDTH_AND_PADDING) * WIDTH_AND_PADDING - WIDTH_AND_PADDING;
+	ctx.beginPath();
+	ctx.rect(xCalc, yCalc, COIN_WIDTH * 2, COIN_WIDTH);
+	ctx.stroke();
+	ctx.lineWidth=3;
 }
 
 function swapCoins(){
@@ -50,36 +68,23 @@ function swapCoins(){
 
 function checkForBreaks(){
 	for (column = 0; column < COINS_PER_LINE; column++) {
-		for (row = 0; row < COINS_PER_LINE; row++) { 
-			if(shouldBreak(coinLayout, column, row)){
+		for (row = 0; row < COINS_PER_LINE; row++) {
+			if(shouldBreak(coinLayout, column, row) && !coinLayout[column][row].broken){
 				breakCoin(column, row);
-	
+
 			}
 		}
 	}
-
 }
 
-function moveRowUp(column, row){
-	// for (row = row; row < COINS_PER_LINE; row++) {
-	// 	coinLayout[column][COINS_PER_LINE + 1] = getCoin();
-	// 	console.log('column', column);
-	// 	console.log('row',row + 1);
-	// 	if(row + 1 < 10){
-	// 		// coinLayout[column][row + 1].newX = coinLayout[column][row].x; 
-	// 		// coinLayout[column][row + 1].newY = coinLayout[column][row].y;
-	// 		coinLayout[column][row] = coinLayout[column][row + 1];
-	// 	}
-	// }
-}
 
 function generateCoinsArray(){
 	var coinLayout = new Array(COINS_PER_LINE);//columns
 
-	for (column = 0; column < COINS_PER_LINE; column++) { 
+	for (column = 0; column < COINS_PER_LINE; column++) {
 		coinLayout[column] = new Array(COINS_PER_LINE);
 
-		for (row = 0; row < COINS_PER_LINE; row++) { 
+		for (row = 0; row < COINS_PER_LINE; row++) {
 			coinLayout[column][row] = getCoin(column, row);
 
 			while (shouldBreak(coinLayout, column, row)){
@@ -90,8 +95,8 @@ function generateCoinsArray(){
 	return coinLayout;
 }
 
-function drawCoins(){
-	for (column = 0; column < COINS_PER_LINE; column++) { 
+function drawCoins(coinLayout){
+	for (column = 0; column < COINS_PER_LINE; column++) {
 		for (row = 0; row < COINS_PER_LINE; row++) {
 
 			var coin = coinLayout[column][row];
@@ -104,12 +109,14 @@ function drawCoins(){
 				if(coin.x > coin.newX){
 					coin.x -= SWAP_SPEED;
 				}
-				if(coin.y > coin.newY ){
-					coin.y -= SWAP_SPEED;
-				}
 				if(coin.y < coin.newY){
 					coin.y += SWAP_SPEED;
 				}
+				if(coin.y > coin.newY ){
+					coin.y -= SWAP_SPEED;
+					//console.log('Im moving, my y:',coin.y ,'my new y:',coin.newY);
+				}
+
 
 				drawCoin(coin);
 			}
@@ -117,24 +124,30 @@ function drawCoins(){
 	}
 }
 
+//is coin above
+
 function breakCoin(column, row){
 	coinLayout[column][row].broken = true;
-	// if (row > -1) {
-	// 	console.log(coinLayout[column]);
- //   		coinLayout[column].splice(row, 1);
- //   		console.log(coinLayout[column]);
-	// }
-	// coinLayout[column][9] = getCoin();
-	// //console.log(coinLayout);
+
+	for (row; row < COINS_PER_LINE; row++) {//these need to go up
+		if(coinLayout[column][row - 1]){//if theres one above it. which there should be?
+			//coinLayout[column][row].img = document.getElementById("coin5");
+
+			// coinLayout[column][row - 1] = coinLayout[column][row];//move up
+			coinLayout[column][row].newY -= WIDTH_AND_PADDING;
+		}
+	}
+
+
 }
 
 function getCoin(column, row){
 	var x = COIN_PADDING + WIDTH_AND_PADDING * column;
 	var y = COIN_PADDING + WIDTH_AND_PADDING * row;
-	var coins = 
+	var coins =
 	[
 		{
-			id: 1,
+			id: 'yellow',
 			img: document.getElementById("coin1"),
 			x,
 			y,
@@ -143,7 +156,7 @@ function getCoin(column, row){
 			broken: false
 		},
 		{
-			id: 2,
+			id: 'orange',
 			img: document.getElementById("coin2"),
 			x,
 			y,
@@ -152,7 +165,7 @@ function getCoin(column, row){
 			broken: false
 		},
 		{
-			id: 3,
+			id: 'grey',
 			img: document.getElementById("coin3"),
 			x,
 			y,
@@ -161,7 +174,7 @@ function getCoin(column, row){
 			broken: false
 		},
 		{
-			id: 4,
+			id: 'green',
 			img: document.getElementById("coin4"),
 			x,
 			y,
@@ -207,20 +220,8 @@ function shouldBreak(coinLayout, column, row){
 	}
 }
 
-function frame(){
-	ctx.clearRect(0, 0, c.width, c.height);
-	drawCoins();
-	var xCalc = Math.round(cursorX/WIDTH_AND_PADDING) * WIDTH_AND_PADDING - WIDTH_AND_PADDING;
-	var yCalc = Math.round(cursorY/WIDTH_AND_PADDING) * WIDTH_AND_PADDING - WIDTH_AND_PADDING;
-	ctx.beginPath();
-	ctx.rect(xCalc, yCalc, COIN_WIDTH * 2, COIN_WIDTH);
-	ctx.stroke();
-	ctx.lineWidth=3;
-
-	window.requestAnimationFrame(frame);
-}
-
 function drawCoin(coin){
+		ctx.beginPath();
 	if(coin.img){
 		ctx.drawImage(coin.img, coin.x, coin.y);
 	}
