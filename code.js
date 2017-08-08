@@ -27,18 +27,21 @@ window.onload = function () {
 
 	coinLayout = generateCoinsArray();
 
-	window.requestAnimationFrame(frame);
+	// window.requestAnimationFrame(frame);
+	window.setInterval(function(){
+  frame();
+}, 50);
 }
 
 
 function frame(){
 	ctx.clearRect(0, 0, c.width, c.height);
-
+		checkForBreaks();
 	drawCoins(coinLayout);
 	drawSelector();
 
 
-	window.requestAnimationFrame(frame);
+	//window.requestAnimationFrame(frame);
 }
 
 function drawSelector(){
@@ -67,16 +70,17 @@ function swapCoins(){
 }
 
 function checkForBreaks(){
+
 	for (column = 0; column < COINS_PER_LINE; column++) {
 		for (row = 0; row < COINS_PER_LINE; row++) {
-			if(shouldBreak(coinLayout, column, row) && !coinLayout[column][row].broken){
+			if(shouldBreak(coinLayout,column, row)){
 				breakCoin(column, row);
+				console.log('break');
 
 			}
 		}
 	}
 }
-
 
 function generateCoinsArray(){
 	var coinLayout = new Array(COINS_PER_LINE);//columns
@@ -101,7 +105,7 @@ function drawCoins(coinLayout){
 
 			var coin = coinLayout[column][row];
 
-			if(coin && !coin.broken){
+			if(coin){
 
 				if(coin.x < coin.newX ){
 					coin.x += SWAP_SPEED;
@@ -127,17 +131,22 @@ function drawCoins(coinLayout){
 //is coin above
 
 function breakCoin(column, row){
-	coinLayout[column][row].broken = true;
+	// coinLayout[column][row].broken = true;
+	///console.log('broken');
 
 	for (row; row < COINS_PER_LINE; row++) {//these need to go up
 		if(coinLayout[column][row - 1]){//if theres one above it. which there should be?
-			//coinLayout[column][row].img = document.getElementById("coin5");
 
-			// coinLayout[column][row - 1] = coinLayout[column][row];//move up
 			coinLayout[column][row].newY -= WIDTH_AND_PADDING;
+
+			coinLayout[column][row - 1] = coinLayout[column][row];//move up
+			coinLayout[column][9] = getCoin(column, 9);
+			coinLayout[column][9].y = 522 + WIDTH_AND_PADDING;
+
+			//coinLayout[column][9].img = document.getElementById("coin5");
+
 		}
 	}
-
 
 }
 
@@ -153,7 +162,6 @@ function getCoin(column, row){
 			y,
 			newX: x,
 			newY: y,
-			broken: false
 		},
 		{
 			id: 'orange',
@@ -188,33 +196,40 @@ function getCoin(column, row){
 }
 
 function shouldBreak(coinLayout, column, row){
-	var coin = coinLayout[column][row];
-	if (coinLayout[column - 1] && (coinLayout[column - 1][row].id === coin.id)){//1 left
-		if(coinLayout[column - 2] && (coinLayout[column - 2][row].id === coin.id)){//2 left
+	var a = coinLayout.slice(0);
+	var coin = a[column][row];
+	if (a[column - 1] && (a[column - 1][row].id === coin.id)){//1 left
+		if(a[column - 2] && (a[column - 2][row].id === coin.id)){//2 left
+			console.log('returning true');
 			return true;
 		}
-		if (coinLayout[column + 1] && (coinLayout[column + 1][row].id === coin.id)){//1 right
-			return true;
-		}
-	}
-
-	if (coinLayout[column][row - 1] && (coinLayout[column][row - 1].id === coin.id)){//1 up
-		if (coinLayout[column][row - 2] && (coinLayout[column][row - 2].id === coin.id)){//2 up
-			return true;
-		}
-		if (coinLayout[column][row + 1] && (coinLayout[column][row + 1].id === coin.id)){//1 down
+		if (a[column + 1] && (a[column + 1][row].id === coin.id)){//1 right
+			console.log('returning true');
 			return true;
 		}
 	}
 
-	if (coinLayout[column + 1] && (coinLayout[column + 1][row].id === coin.id)){//1 right
-		if(coinLayout[column + 2] && (coinLayout[column + 2][row].id === coin.id)){//2 right
+	if (a[column][row - 1] && (a[column][row - 1].id === coin.id)){//1 up
+		if (a[column][row - 2] && (a[column][row - 2].id === coin.id)){//2 up
+			console.log('returning true');
+			return true;
+		}
+		if (a[column][row + 1] && (a[column][row + 1].id === coin.id)){//1 down
+			console.log('returning true');
 			return true;
 		}
 	}
 
-	if (coinLayout[column][row + 1] && (coinLayout[column][row + 1].id === coin.id)){//1 down
-		if (coinLayout[column][row + 2] && (coinLayout[column][row + 2].id === coin.id)){//2 down
+	if (a[column + 1] && (a[column + 1][row].id === coin.id)){//1 right
+		if(a[column + 2] && (a[column + 2][row].id === coin.id)){//2 right
+			console.log('returning true');
+			return true;
+		}
+	}
+
+	if (a[column][row + 1] && (a[column][row + 1].id === coin.id)){//1 down
+		if (a[column][row + 2] && (a[column][row + 2].id === coin.id)){//2 down
+			console.log('returning true');
 			return true;
 		}
 	}
@@ -225,4 +240,5 @@ function drawCoin(coin){
 	if(coin.img){
 		ctx.drawImage(coin.img, coin.x, coin.y);
 	}
+	ctx.fillText(coin.broken,coin.x + 25, coin.y + 25);
 }
