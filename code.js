@@ -33,11 +33,15 @@ window.onload = function () {
 
 function frame(){
 	ctx.clearRect(0, 0, c.width, c.height);
-	checkForBreaks();
-breakCoins();
+
+	//console.log(isAnimationDone());
+	if(isAnimationDone() == true){
+		checkForBreaks();
+	}
+
 	drawCoins(coinLayout);
 	drawSelector();
-
+	breakCoins();
 
 	window.requestAnimationFrame(frame);
 }
@@ -46,25 +50,23 @@ function drawSelector(){
 	var xCalc = Math.round(cursorX/WIDTH_AND_PADDING) * WIDTH_AND_PADDING - WIDTH_AND_PADDING;
 	var yCalc = Math.round(cursorY/WIDTH_AND_PADDING) * WIDTH_AND_PADDING - WIDTH_AND_PADDING;
 	ctx.beginPath();
-	ctx.rect(xCalc, yCalc, COIN_WIDTH * 2, COIN_WIDTH);
+	ctx.rect(xCalc, yCalc, COIN_WIDTH, COIN_WIDTH *2);
 	ctx.stroke();
 	ctx.lineWidth=3;
 }
 
 function swapCoins(){
-	var column = Math.round(cursorX/WIDTH_AND_PADDING);
+	var column = Math.round(cursorX/WIDTH_AND_PADDING)-1;
 	var row = Math.round(cursorY/WIDTH_AND_PADDING)-1;
 
-	var leftCoin = coinLayout[column-1] && coinLayout[column-1][row];
-	var rightCoin = coinLayout[column] && coinLayout[column][row];
+	var bottomCoin = coinLayout[column][row+1];
+	var topCoin = coinLayout[column][row];
 
-	if(leftCoin && rightCoin){
-		rightCoin.newX-= WIDTH_AND_PADDING;
-		leftCoin.newX+= WIDTH_AND_PADDING;
-
-		coinLayout[column][row]= leftCoin;
-		coinLayout[column-1][row]= rightCoin;
+	if(bottomCoin && topCoin){
+		coinLayout[column][row]= bottomCoin;
+		coinLayout[column][row + 1]= topCoin;
 	}
+	moveCoins();
 }
 
 function checkForBreaks(){
@@ -72,11 +74,11 @@ function checkForBreaks(){
 		for (row = 0; row < COINS_PER_LINE; row++) {
 			if(shouldBreak(coinLayout, column, row) && !coinLayout[column][row].broken){
 				coinLayout[column][row].broken = true;
+				console.log()
 
 			}
 		}
 	}
-	breakCoins();
 }
 
 
@@ -97,6 +99,19 @@ function generateCoinsArray(){
 	return coinLayout;
 }
 
+function isAnimationDone(){
+		for (column = 0; column < COINS_PER_LINE; column++) {
+			for (row = 0; row < COINS_PER_LINE; row++) {
+				if(coinLayout[column][row].y != coinLayout[column][row].newY ){
+					//console.log('row:', row, ' column:', column)
+					console.log('new-y:', coinLayout[column][row].newY, ' y:', coinLayout[column][row].y);
+					return false;
+				}
+			}
+		}
+	return true;
+}
+
 function drawCoins(coinLayout){
 	for (column = 0; column < COINS_PER_LINE; column++) {
 		for (row = 0; row < COINS_PER_LINE; row++) {
@@ -104,22 +119,20 @@ function drawCoins(coinLayout){
 			var coin = coinLayout[column][row];
 
 			if(coin && !coin.broken){
-
-				if(coin.x < coin.newX ){
-					coin.x += SWAP_SPEED;
-				}
-				if(coin.x > coin.newX){
-					coin.x -= SWAP_SPEED;
-				}
-				if(coin.y < coin.newY){
+				if(coin.y < coin.newY){//going down
 					coin.y += SWAP_SPEED;
+
+					if((coin.newY - coin.y) < SWAP_SPEED){
+						coin.y = coin.newY;
+					}
+
 				}
-				if(coin.y > coin.newY ){
+				if(coin.y > coin.newY ){//going up
 					coin.y -= SWAP_SPEED;
-					//console.log('Im moving, my y:',coin.y ,'my new y:',coin.newY);
+					if((coin.y - coin.newY ) < SWAP_SPEED){
+						coin.y = coin.newY;
+					}
 				}
-
-
 				drawCoin(coin);
 			}
 		}
@@ -128,7 +141,7 @@ function drawCoins(coinLayout){
 
 //is coin above
 
-function breakCoins(column, row){
+function breakCoins(){
 
 for (column = 0; column < COINS_PER_LINE; column++) {
 	for (row = 0; row < COINS_PER_LINE; row++) {
@@ -144,16 +157,16 @@ for (column = 0; column < COINS_PER_LINE; column++) {
 		}
 	}
 	}
+
 	moveCoins();
 }
 
+//animate coins up
 function moveCoins(){
 	for (column = 0; column < COINS_PER_LINE; column++) {
 		for (row = 0; row < COINS_PER_LINE; row++) {
-			//var x = COIN_PADDING + WIDTH_AND_PADDING * column;
 			var y = COIN_PADDING + WIDTH_AND_PADDING * row;
 			coinLayout[column][row].newY = y;
-
 		}
 	}
 }
@@ -168,7 +181,6 @@ function getCoin(column, row){
 			img: document.getElementById("coin1"),
 			x,
 			y,
-			newX: x,
 			newY: y,
 			broken: false
 		},
@@ -177,7 +189,6 @@ function getCoin(column, row){
 			img: document.getElementById("coin2"),
 			x,
 			y,
-			newX: x,
 			newY: y,
 			broken: false
 		},
@@ -186,7 +197,6 @@ function getCoin(column, row){
 			img: document.getElementById("coin3"),
 			x,
 			y,
-			newX: x,
 			newY: y,
 			broken: false
 		},
@@ -195,7 +205,6 @@ function getCoin(column, row){
 			img: document.getElementById("coin4"),
 			x,
 			y,
-			newX: x,
 			newY: y,
 			broken: false
 		},
@@ -239,9 +248,7 @@ function shouldBreak(coinLayout, column, row){
 
 function drawCoin(coin){
 		ctx.beginPath();
-	if(coin.img){
 		ctx.drawImage(coin.img, coin.x, coin.y);
-	}
 }
 
 //todo
