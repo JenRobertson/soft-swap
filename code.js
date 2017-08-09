@@ -1,8 +1,10 @@
 var COIN_PADDING = 2;
-var COIN_WIDTH = 50;
+var COIN_WIDTH = 100;
 var WIDTH_AND_PADDING = COIN_WIDTH + COIN_PADDING;
-var COINS_PER_LINE = 10;
+var COINS_PER_LINE = 8;
 var ANIMATION_SPEED = 5;
+
+//http://editor.method.ac
 
 var ctx, c, coinLayout, cursorX, cursorY;
 
@@ -145,7 +147,7 @@ function getCoin(column, row){
 	[
 		{
 			id: 'yellow',
-			img: document.getElementById("coin1"),
+			img: document.getElementById("mookie"),
 			x,
 			y,
 			newY: y,
@@ -153,7 +155,7 @@ function getCoin(column, row){
 		},
 		{
 			id: 'orange',
-			img: document.getElementById("coin2"),
+			img: document.getElementById("chicken"),
 			x,
 			y,
 			newY: y,
@@ -161,7 +163,7 @@ function getCoin(column, row){
 		},
 		{
 			id: 'grey',
-			img: document.getElementById("coin3"),
+			img: document.getElementById("alpaca"),
 			x,
 			y,
 			newY: y,
@@ -169,7 +171,7 @@ function getCoin(column, row){
 		},
 		{
 			id: 'green',
-			img: document.getElementById("coin4"),
+			img: document.getElementById("toast"),
 			x,
 			y,
 			newY: y,
