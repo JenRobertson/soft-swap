@@ -22,7 +22,7 @@ window.onload = function () {
 
 	c.onclick = function(){
 		swapCoins();
-		checkForBreaks();
+		//checkForBreaks();
 	}
 
 	coinLayout = generateCoinsArray();
@@ -33,7 +33,8 @@ window.onload = function () {
 
 function frame(){
 	ctx.clearRect(0, 0, c.width, c.height);
-
+	checkForBreaks();
+breakCoins();
 	drawCoins(coinLayout);
 	drawSelector();
 
@@ -70,11 +71,12 @@ function checkForBreaks(){
 	for (column = 0; column < COINS_PER_LINE; column++) {
 		for (row = 0; row < COINS_PER_LINE; row++) {
 			if(shouldBreak(coinLayout, column, row) && !coinLayout[column][row].broken){
-				breakCoin(column, row);
+				coinLayout[column][row].broken = true;
 
 			}
 		}
 	}
+	breakCoins();
 }
 
 
@@ -126,19 +128,34 @@ function drawCoins(coinLayout){
 
 //is coin above
 
-function breakCoin(column, row){
-	coinLayout[column][row].broken = true;
+function breakCoins(column, row){
 
-	for (row; row < COINS_PER_LINE; row++) {//these need to go up
-		if(coinLayout[column][row - 1]){//if theres one above it. which there should be?
-			//coinLayout[column][row].img = document.getElementById("coin5");
+for (column = 0; column < COINS_PER_LINE; column++) {
+	for (row = 0; row < COINS_PER_LINE; row++) {
 
-			// coinLayout[column][row - 1] = coinLayout[column][row];//move up
-			coinLayout[column][row].newY -= WIDTH_AND_PADDING;
+		if(coinLayout[column][row].broken){
+			console.log('broken');
+
+			coinLayout[column].splice(row, 1);
+
+			coinLayout[column][9] = getCoin(column,9);
+			coinLayout[column][9].y = 522 + WIDTH_AND_PADDING;
+
 		}
 	}
+	}
+	moveCoins();
+}
 
+function moveCoins(){
+	for (column = 0; column < COINS_PER_LINE; column++) {
+		for (row = 0; row < COINS_PER_LINE; row++) {
+			//var x = COIN_PADDING + WIDTH_AND_PADDING * column;
+			var y = COIN_PADDING + WIDTH_AND_PADDING * row;
+			coinLayout[column][row].newY = y;
 
+		}
+	}
 }
 
 function getCoin(column, row){
@@ -226,3 +243,9 @@ function drawCoin(coin){
 		ctx.drawImage(coin.img, coin.x, coin.y);
 	}
 }
+
+//todo
+//fix up animation
+//wait for each break's animation to done before checking breaking again
+
+//wait for animation to finish before doing anhting else
