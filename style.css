@@ -1,0 +1,7 @@
+	.hide{
+		display: none;
+		width: 100px;
+	}
+	canvas{
+		background-color: grey;
+	}

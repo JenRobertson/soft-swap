@@ -1,20 +1,22 @@
-<canvas id="myCanvas" width="522" height="522" style="border:1px solid #000000; onmousemove="mouseInRect(event)"">
+<html>
+<head>
+	<title>Treasure swap</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+	<canvas id="myCanvas" width="522" height="522" style="border:1px solid #000000; onmousemove="mouseInRect(event)"">
 </canvas>
 
-<img src="img/coin1.png" id="coin1" class="hide">
-<img src="img/coin2.png" id="coin2" class="hide">
-<img src="img/coin3.png" id="coin3" class="hide">
-<img src="img/coin4.png" id="coin4" class="hide">
-<img src="img/broken.jpeg" id="coin5" class="hide">
+	<div class="hide">
+		<img src="img/coin1.png" id="coin1">
+		<img src="img/coin2.png" id="coin2">
+		<img src="img/coin3.png" id="coin3">
+		<img src="img/coin4.png" id="coin4">
+		<img src="img/broken.jpeg" id="coin5">
+	</div>
 
-<style>
-	.hide{
-		display: none;
-		width: 100px;
-	}
-	canvas{
-		background-color: grey;
-	}
-</style>
+</body>
 
 <script src="code.js"></script>
+</html>

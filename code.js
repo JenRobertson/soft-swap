@@ -4,11 +4,7 @@ var WIDTH_AND_PADDING = COIN_WIDTH + COIN_PADDING;
 var COINS_PER_LINE = 10;
 var ANIMATION_SPEED = 5;
 
-var ctx;
-var c;
-var coinLayout;
-var cursorX;
-var cursorY;
+var ctx, c, coinLayout, cursorX, cursorY;
 
 window.onload = function () {
 	c = document.getElementById("myCanvas");
@@ -219,7 +215,7 @@ function shouldBreak(coinLayout, column, row){
 
 function drawSelector(){
 	var xCalc = Math.round(cursorX/WIDTH_AND_PADDING) * WIDTH_AND_PADDING - WIDTH_AND_PADDING;
-	var yCalc = Math.round(cursorY/WIDTH_AND_PADDING) * WIDTH_AND_PADDING - WIDTH_AND_PADDING;
+	var yCalc = Math.round(cursorY/WIDTH_AND_PADDING) * WIDTH_AND_PADDING - COIN_WIDTH;
 	ctx.beginPath();
 	ctx.rect(xCalc, yCalc, COIN_WIDTH, COIN_WIDTH * 2);
 	ctx.stroke();
