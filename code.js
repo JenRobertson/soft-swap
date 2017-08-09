@@ -139,11 +139,10 @@ for (column = 0; column < COINS_PER_LINE; column++) {
 			coinLayout[column].splice(row, 1);
 
 			coinLayout[column][9] = getCoin(column,9);
+			coinLayout[column][9].y = 522 + WIDTH_AND_PADDING;
 
 		}
 	}
-
-
 	}
 	moveCoins();
 }
@@ -244,3 +243,9 @@ function drawCoin(coin){
 		ctx.drawImage(coin.img, coin.x, coin.y);
 	}
 }
+
+//todo
+//fix up animation
+//wait for each break's animation to done before checking breaking again
+
+//wait for animation to finish before doing anhting else
