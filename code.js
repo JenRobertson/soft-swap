@@ -1,8 +1,8 @@
-var COIN_PADDING = 2;
+var COIN_PADDING = 0;
 var COIN_WIDTH = 100;
 var WIDTH_AND_PADDING = COIN_WIDTH + COIN_PADDING;
 var COINS_PER_LINE = 8;
-var ANIMATION_SPEED = 5;
+var ANIMATION_SPEED = 10;
 
 //http://editor.method.ac
 
@@ -216,15 +216,33 @@ function shouldBreak(coinLayout, column, row){
 }
 
 function drawSelector(){
-	var xCalc = Math.round(cursorX/WIDTH_AND_PADDING) * WIDTH_AND_PADDING - WIDTH_AND_PADDING;
+	var xCalc = Math.round(cursorX/WIDTH_AND_PADDING) * WIDTH_AND_PADDING - COIN_WIDTH;
 	var yCalc = Math.round(cursorY/WIDTH_AND_PADDING) * WIDTH_AND_PADDING - COIN_WIDTH;
 	ctx.beginPath();
-	ctx.rect(xCalc, yCalc, COIN_WIDTH, COIN_WIDTH * 2);
-	ctx.stroke();
-	ctx.lineWidth = 3;
+	// ctx.rect(xCalc, yCalc, COIN_WIDTH, COIN_WIDTH * 2);
+	ctx.lineWidth = 4;
+	ctx.strokeStyle = '#ffffff';
+	ctx.roundRect(xCalc, yCalc, COIN_WIDTH, COIN_WIDTH * 2, 20).stroke();
+	ctx.strokeStyle = '#000000';
+	ctx.roundRect(xCalc - 2, yCalc - 2, COIN_WIDTH + 5, (COIN_WIDTH * 2) + 5, 20).stroke();
+
+
 }
 
 function drawCoin(coin){
 		ctx.beginPath();
 		ctx.drawImage(coin.img, coin.x, coin.y, COIN_WIDTH, COIN_WIDTH);
+}
+
+CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+  if (w < 2 * r) r = w / 2;
+  if (h < 2 * r) r = h / 2;
+  this.beginPath();
+  this.moveTo(x+r, y);
+  this.arcTo(x+w, y,   x+w, y+h, r);
+  this.arcTo(x+w, y+h, x,   y+h, r);
+  this.arcTo(x,   y+h, x,   y,   r);
+  this.arcTo(x,   y,   x+w, y,   r);
+  this.closePath();
+  return this;
 }
