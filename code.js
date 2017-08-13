@@ -9,6 +9,7 @@ const BOARD_MARGIN_TOP = 100;
 const BOARD_MARGIN_LEFT = 100;
 const BOARD_MARGIN_BOTTOM = 100;
 const BOARD_MARGIN_RIGHT = 100;
+const BOARD_COLOR = '#a996e4';
 
 const ANIMATION_SPEED = 10;
 
@@ -49,6 +50,7 @@ window.onload = function () {
 //runs every frame
 function frame(){
 	ctx.clearRect(0, 0, c.width, c.height);
+	drawBoardArea();
 
 	if(isAnimationDone()){
 		checkForBreaks();
@@ -61,7 +63,6 @@ function frame(){
 	drawScore();
 	hideStuffOffTheEdge();
 
-	drawBoardArea();
 
 	window.requestAnimationFrame(frame);
 }
@@ -101,12 +102,29 @@ function swapPieces(){
 }
 
 function checkForBreaks(){
+	var breaks = 0;
 	for (column = 0; column < PIECES_PER_LINE; column++) {
 		for (row = 0; row < PIECES_PER_LINE; row++) {
 			if(shouldBreak(pieceLayout, column, row) && !pieceLayout[column][row].broken){
 				pieceLayout[column][row].broken = true;
+				breaks++;
 			}
 		}
+	}
+	if(breaks == 3){
+		score+=1;
+	}
+	else if(breaks == 4){
+		score+=2;
+	}
+	else if(breaks == 5){
+		score+=4;
+	}
+	else if(breaks == 6){
+		score+=8;
+	}
+	else if(breaks > 6){
+		score+=20;
 	}
 }
 
@@ -273,20 +291,25 @@ function drawSelector(){
 
 function drawPiece(piece){
 	ctx.beginPath();
+	ctx.globalAlpha = 0.5;
 	ctx.drawImage(piece.img, piece.x, piece.y, PIECE_WIDTH, PIECE_WIDTH);
+	ctx.globalAlpha = 1;
 }
 
 function drawBoardArea(){
+	ctx.fillStyle=BOARD_COLOR;
+	ctx.fillRect(BOARD_MARGIN_LEFT,BOARD_MARGIN_TOP,BOARD_WIDTH,BOARD_HEIGHT);
 	ctx.rect(BOARD_MARGIN_LEFT,BOARD_MARGIN_TOP,BOARD_WIDTH,BOARD_HEIGHT);
 	ctx.stroke();
+	ctx.fillStyle='#000000';
 }
 function hideStuffOffTheEdge(){
-	ctx.clearRect(0, BOARD_MARGIN_TOP + BOARD_WIDTH, BOARD_WIDTH, BOARD_MARGIN_BOTTOM);//bottom
+	ctx.clearRect(0, BOARD_MARGIN_TOP + BOARD_WIDTH, c.width, BOARD_MARGIN_BOTTOM);//bottom
 }
 
 function drawScore(){
 	ctx.font = "30px Arial";
-	ctx.fillText('Score: ' + score,10,50);
+	ctx.fillText('Score: ' + score,BOARD_MARGIN_LEFT,50);
 }
 
 CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
