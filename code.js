@@ -12,6 +12,7 @@ const BOARD_MARGIN_RIGHT = 100;
 const BOARD_COLOR = '#a996e4';
 
 const ANIMATION_SPEED = 10;
+const FADE_SPEED = 0.05;
 
 const PIECE_IMAGES = [
 	document.getElementById("mookie"),
@@ -52,11 +53,14 @@ function frame(){
 	ctx.clearRect(0, 0, c.width, c.height);
 	drawBoardArea();
 
+	//console.log(isAnimationDone());
+		
 	if(isAnimationDone()){
 		checkForBreaks();
 	}
-
-	breakPieces();
+	if(isAnimationDone()){
+		breakPieces();
+	}
 
 	drawPieces();
 	drawSelector();
@@ -107,6 +111,7 @@ function checkForBreaks(){
 		for (row = 0; row < PIECES_PER_LINE; row++) {
 			if(shouldBreak(pieceLayout, column, row) && !pieceLayout[column][row].broken){
 				pieceLayout[column][row].broken = true;
+				pieceLayout[column][row].newA = 0;
 				breaks++;
 			}
 		}
@@ -129,13 +134,17 @@ function checkForBreaks(){
 }
 
 function isAnimationDone(){
-		for (column = 0; column < PIECES_PER_LINE; column++) {
-			for (row = 0; row < PIECES_PER_LINE; row++) {
-				if(pieceLayout[column][row].y != pieceLayout[column][row].newY ){
-					return false;
-				}
+	for (column = 0; column < PIECES_PER_LINE; column++) {
+		for (row = 0; row < PIECES_PER_LINE; row++) {
+			if(pieceLayout[column][row].y != pieceLayout[column][row].newY ){
+				return false;
+			}
+			if(pieceLayout[column][row].a != pieceLayout[column][row].newA ){
+				// console.log('my a is:' ,pieceLayout[column][row].a);
+				return false;
 			}
 		}
+	}
 	return true;
 }
 
@@ -157,6 +166,12 @@ function drawPieces(){
 					piece.y = piece.newY;
 				}
 			}
+			if(piece.a > piece.newA ){//alpha going down
+				piece.a -= FADE_SPEED
+				if(piece.a  < FADE_SPEED){//fill in extra gap
+					piece.a = piece.newA;
+				}
+			}
 			drawPiece(piece);
 		}
 	}
@@ -169,18 +184,18 @@ function breakPieces(){
 				pieceLayout[column].splice(row, 1);
 				pieceLayout[column][PIECES_PER_LINE-1] = getPiece(column, PIECES_PER_LINE-1);
 
-				//add animation delay
-				let animationDelay = 0;
+				//add moving up offset
+				let movingUpOffset = 0;
 				for (i = 1; i < PIECES_PER_LINE; i++) {
 					if (pieceLayout[column][PIECES_PER_LINE-i].y > BOARD_HEIGHT){//one above is also a new piece
-						animationDelay+=WIDTH_AND_PADDING;
+						movingUpOffset+=WIDTH_AND_PADDING;
 					}
 					//stop super breaks
 					while (shouldBreak(pieceLayout, column, PIECES_PER_LINE-1)){
 						pieceLayout[column][PIECES_PER_LINE-1] = getPiece(column, row);
 					}
 				}
-				pieceLayout[column][PIECES_PER_LINE-1].y = BOARD_HEIGHT + WIDTH_AND_PADDING + animationDelay;
+				pieceLayout[column][PIECES_PER_LINE-1].y = BOARD_HEIGHT + WIDTH_AND_PADDING + movingUpOffset;
 			}
 		}
 	}
@@ -208,6 +223,8 @@ function getPiece(column, row){
 			x,
 			y,
 			newY: y,
+			a: 1,
+			newA: 1,
 			broken: false
 		},
 		{
@@ -216,6 +233,8 @@ function getPiece(column, row){
 			x,
 			y,
 			newY: y,
+			a: 1,
+			newA: 1,
 			broken: false
 		},
 		{
@@ -224,6 +243,8 @@ function getPiece(column, row){
 			x,
 			y,
 			newY: y,
+			a: 1,
+			newA: 1,
 			broken: false
 		},
 		{
@@ -232,6 +253,8 @@ function getPiece(column, row){
 			x,
 			y,
 			newY: y,
+			a: 1,
+			newA: 1,
 			broken: false
 		},
 	];
@@ -291,7 +314,7 @@ function drawSelector(){
 
 function drawPiece(piece){
 	ctx.beginPath();
-	ctx.globalAlpha = 0.5;
+	ctx.globalAlpha = piece.a;
 	ctx.drawImage(piece.img, piece.x, piece.y, PIECE_WIDTH, PIECE_WIDTH);
 	ctx.globalAlpha = 1;
 }
