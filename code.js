@@ -3,6 +3,8 @@ const PIECE_WIDTH = 100;
 const WIDTH_AND_PADDING = PIECE_WIDTH + PIECE_PADDING;
 const PIECES_PER_LINE = 8;
 
+const RARE_PIECE_ODDS = 20;
+
 const BOARD_WIDTH = WIDTH_AND_PADDING * PIECES_PER_LINE;
 const BOARD_HEIGHT = WIDTH_AND_PADDING * PIECES_PER_LINE;
 const BOARD_MARGIN_TOP = 100;
@@ -19,7 +21,7 @@ const PIECE_IMAGES = [
 	document.getElementById("chicken"),
 	document.getElementById("alpaca"),
 	document.getElementById("toast"),
-	document.getElementById("gemrow"),
+	document.getElementById("star"),
 ];
 
 //http://editor.method.ac
@@ -91,17 +93,25 @@ function swapPieces(){
 	var column = Math.round(cursorX/WIDTH_AND_PADDING)-1;
 	var row = Math.round(cursorY/WIDTH_AND_PADDING)-1;
 
-	if (pieceLayout[column] && pieceLayout[column][row]){
+	var bottomPiece = pieceLayout[column][row+1];
+	var topPiece = pieceLayout[column][row];
 
-		var bottomPiece = pieceLayout[column][row+1];
-		var topPiece = pieceLayout[column][row];
+	if(bottomPiece && topPiece){
 
-		if(bottomPiece && topPiece){
-			pieceLayout[column][row]= bottomPiece;
-			pieceLayout[column][row + 1]= topPiece;
+		if(bottomPiece.id == 'row_gem'){
+			powerUp1(column, row+1);
 		}
-		movePieces();
+		else if(topPiece.id == 'row_gem'){
+			powerUp1(column, row);
+		}
+		else{
+		pieceLayout[column][row]= bottomPiece;
+		pieceLayout[column][row + 1]= topPiece;
+		}
+
 	}
+	movePieces();
+
 }
 
 function checkForBreaks(){
@@ -200,6 +210,18 @@ function breakPieces(){
 	movePieces();
 }
 
+
+function powerUp1(column, row){
+	for (i = 0; i < PIECES_PER_LINE; i++) {
+		pieceLayout[i][row].id = 'row_gem';
+		pieceLayout[i][row].img = PIECE_IMAGES[4];
+	}
+	for (j = 0; j < PIECES_PER_LINE; j++) {
+		pieceLayout[column][j].id = 'row_gem';
+		pieceLayout[column][j].img = PIECE_IMAGES[4];
+	}
+}
+
 //animates pieces to their new index
 function movePieces(){
 	for (column = 0; column < PIECES_PER_LINE; column++) {
@@ -258,7 +280,7 @@ function getPiece(column, row){
 	];
 	const rarePieces = [
 		{
-			id: 5,
+			id: 'row_gem',
 			img: PIECE_IMAGES[4],
 			x,
 			y,
@@ -269,7 +291,7 @@ function getPiece(column, row){
 		}
 	];
 
-	var rand1 = Math.floor((Math.random() * 64) + 0);
+	var rand1 = Math.floor((Math.random() * RARE_PIECE_ODDS) + 0);
 	if (rand1 == 1){
 		var rand2 = Math.floor((Math.random() * rarePieces.length) + 0);
 		return rarePieces[rand2];
