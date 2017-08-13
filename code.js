@@ -3,8 +3,6 @@ const PIECE_WIDTH = 100;
 const WIDTH_AND_PADDING = PIECE_WIDTH + PIECE_PADDING;
 const PIECES_PER_LINE = 8;
 
-const RARE_PIECE_ODDS = 20;
-
 const BOARD_WIDTH = WIDTH_AND_PADDING * PIECES_PER_LINE;
 const BOARD_HEIGHT = WIDTH_AND_PADDING * PIECES_PER_LINE;
 const BOARD_MARGIN_TOP = 100;
@@ -13,8 +11,9 @@ const BOARD_MARGIN_BOTTOM = 100;
 const BOARD_MARGIN_RIGHT = 100;
 const BOARD_COLOR = '#a996e4';
 
-const ANIMATION_SPEED = 10;
-const FADE_SPEED = 0.05;
+const ANIMATION_SPEED = 15;
+const FADE_SPEED = 0.1;
+const RARE_PIECE_ODDS = 40;
 
 const PIECE_IMAGES = [
 	document.getElementById("mookie"),
@@ -43,7 +42,7 @@ window.onload = function () {
 	}
 
 	c.onclick = function(){
-		if(isAnimationDone()){
+		if(isMovingDone()){
 			swapPieces();
 		}
 	}
@@ -56,10 +55,14 @@ function frame(){
 	ctx.clearRect(0, 0, c.width, c.height);
 	drawBoardArea();
 		
-	if(isAnimationDone()){
+
+	
+	if(isMovingDone()){
 		checkForBreaks();
+
 	}
-	if(isAnimationDone()){
+
+	if(isFadingDone()){
 		breakPieces();
 	}
 
@@ -142,12 +145,20 @@ function checkForBreaks(){
 	}
 }
 
-function isAnimationDone(){
+function isMovingDone(){
 	for (column = 0; column < PIECES_PER_LINE; column++) {
 		for (row = 0; row < PIECES_PER_LINE; row++) {
 			if(pieceLayout[column][row].y != pieceLayout[column][row].newY ){
 				return false;
 			}
+		}
+	}
+	return true;
+}
+
+function isFadingDone(){
+	for (column = 0; column < PIECES_PER_LINE; column++) {
+		for (row = 0; row < PIECES_PER_LINE; row++) {
 			if(pieceLayout[column][row].a != pieceLayout[column][row].newA ){
 				return false;
 			}
@@ -212,14 +223,17 @@ function breakPieces(){
 
 
 function powerUp1(column, row){
-	for (i = 0; i < PIECES_PER_LINE; i++) {
+
+	for (i = 0; i < PIECES_PER_LINE; i++) {//break row
 		pieceLayout[i][row].id = 'row_gem';
 		pieceLayout[i][row].img = PIECE_IMAGES[4];
 	}
-	for (j = 0; j < PIECES_PER_LINE; j++) {
+
+	for (j = 0; j < PIECES_PER_LINE; j++) {//break column
 		pieceLayout[column][j].id = 'row_gem';
 		pieceLayout[column][j].img = PIECE_IMAGES[4];
 	}
+	
 }
 
 //animates pieces to their new index
