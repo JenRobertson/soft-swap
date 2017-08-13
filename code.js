@@ -1,18 +1,18 @@
-var PIECE_PADDING = 0;
-var PIECE_WIDTH = 100;
-var WIDTH_AND_PADDING = PIECE_WIDTH + PIECE_PADDING;
-var PIECES_PER_LINE = 8;
+const PIECE_PADDING = 0;
+const PIECE_WIDTH = 100;
+const WIDTH_AND_PADDING = PIECE_WIDTH + PIECE_PADDING;
+const PIECES_PER_LINE = 8;
 
-var BOARD_WIDTH = WIDTH_AND_PADDING * PIECES_PER_LINE;
-var BOARD_HEIGHT = WIDTH_AND_PADDING * PIECES_PER_LINE;
-var BOARD_MARGIN_TOP = 100;
-var BOARD_MARGIN_LEFT = 100;
-var BOARD_MARGIN_BOTTOM = 100;
-var BOARD_MARGIN_RIGHT = 100;
+const BOARD_WIDTH = WIDTH_AND_PADDING * PIECES_PER_LINE;
+const BOARD_HEIGHT = WIDTH_AND_PADDING * PIECES_PER_LINE;
+const BOARD_MARGIN_TOP = 100;
+const BOARD_MARGIN_LEFT = 100;
+const BOARD_MARGIN_BOTTOM = 100;
+const BOARD_MARGIN_RIGHT = 100;
 
-var ANIMATION_SPEED = 10;
+const ANIMATION_SPEED = 10;
 
-var PIECE_IMAGES = [
+const PIECE_IMAGES = [
 	document.getElementById("mookie"),
 	document.getElementById("chicken"),
 	document.getElementById("alpaca"),
@@ -22,6 +22,7 @@ var PIECE_IMAGES = [
 //http://editor.method.ac
 
 var ctx, c, pieceLayout, cursorX, cursorY;
+var score = 0;
 
 window.onload = function () {
 	c = document.getElementById("myCanvas");
@@ -57,7 +58,8 @@ function frame(){
 
 	drawPieces();
 	drawSelector();
-	hidePiecesOffTheBottom();
+	drawScore();
+	hideStuffOffTheEdge();
 
 	drawBoardArea();
 
@@ -85,14 +87,17 @@ function swapPieces(){
 	var column = Math.round(cursorX/WIDTH_AND_PADDING)-1;
 	var row = Math.round(cursorY/WIDTH_AND_PADDING)-1;
 
-	var bottomPiece = pieceLayout[column][row+1];
-	var topPiece = pieceLayout[column][row];
+	if (pieceLayout[column] && pieceLayout[column][row]){
 
-	if(bottomPiece && topPiece){
-		pieceLayout[column][row]= bottomPiece;
-		pieceLayout[column][row + 1]= topPiece;
+		var bottomPiece = pieceLayout[column][row+1];
+		var topPiece = pieceLayout[column][row];
+
+		if(bottomPiece && topPiece){
+			pieceLayout[column][row]= bottomPiece;
+			pieceLayout[column][row + 1]= topPiece;
+		}
+		movePieces();
 	}
-	movePieces();
 }
 
 function checkForBreaks(){
@@ -252,15 +257,18 @@ function shouldBreak(pieceLayout, column, row){
 function drawSelector(){
 	var xCalc = Math.round(cursorX/WIDTH_AND_PADDING) * WIDTH_AND_PADDING - PIECE_WIDTH + BOARD_MARGIN_LEFT;
 	var yCalc = Math.round(cursorY/WIDTH_AND_PADDING) * WIDTH_AND_PADDING - PIECE_WIDTH + BOARD_MARGIN_TOP;
-	ctx.beginPath();
-	// ctx.rect(xCalc, yCalc, PIECE_WIDTH, PIECE_WIDTH * 2);
-	ctx.lineWidth = 4;
-	ctx.strokeStyle = '#ffffff';
-	ctx.roundRect(xCalc, yCalc, PIECE_WIDTH, PIECE_WIDTH * 2, 20).stroke();
-	ctx.strokeStyle = '#000000';
-	ctx.roundRect(xCalc - 2, yCalc - 2, PIECE_WIDTH + 5, (PIECE_WIDTH * 2) + 5, 20).stroke();
 
+	var column = Math.round(cursorX/WIDTH_AND_PADDING)-1;
+	var row = Math.round(cursorY/WIDTH_AND_PADDING)-1;
 
+	if (pieceLayout[column] && pieceLayout[column][row] && row != 7){//check its over the board
+		ctx.beginPath();
+		ctx.lineWidth = 4;
+		ctx.strokeStyle = '#ffffff';
+		ctx.roundRect(xCalc, yCalc, PIECE_WIDTH, PIECE_WIDTH * 2, 20).stroke();
+		ctx.strokeStyle = '#000000';
+		ctx.roundRect(xCalc - 2, yCalc - 2, PIECE_WIDTH + 5, (PIECE_WIDTH * 2) + 5, 20).stroke();
+	}
 }
 
 function drawPiece(piece){
@@ -272,8 +280,13 @@ function drawBoardArea(){
 	ctx.rect(BOARD_MARGIN_LEFT,BOARD_MARGIN_TOP,BOARD_WIDTH,BOARD_HEIGHT);
 	ctx.stroke();
 }
-function hidePiecesOffTheBottom(){
-	ctx.clearRect(BOARD_MARGIN_LEFT, BOARD_MARGIN_TOP + BOARD_WIDTH, BOARD_WIDTH, BOARD_MARGIN_BOTTOM);
+function hideStuffOffTheEdge(){
+	ctx.clearRect(0, BOARD_MARGIN_TOP + BOARD_WIDTH, BOARD_WIDTH, BOARD_MARGIN_BOTTOM);//bottom
+}
+
+function drawScore(){
+	ctx.font = "30px Arial";
+	ctx.fillText('Score: ' + score,10,50);
 }
 
 CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
