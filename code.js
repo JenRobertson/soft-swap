@@ -19,6 +19,7 @@ const PIECE_IMAGES = [
 	document.getElementById("chicken"),
 	document.getElementById("alpaca"),
 	document.getElementById("toast"),
+	document.getElementById("gemrow"),
 ];
 
 //http://editor.method.ac
@@ -52,8 +53,6 @@ window.onload = function () {
 function frame(){
 	ctx.clearRect(0, 0, c.width, c.height);
 	drawBoardArea();
-
-	//console.log(isAnimationDone());
 		
 	if(isAnimationDone()){
 		checkForBreaks();
@@ -140,7 +139,6 @@ function isAnimationDone(){
 				return false;
 			}
 			if(pieceLayout[column][row].a != pieceLayout[column][row].newA ){
-				// console.log('my a is:' ,pieceLayout[column][row].a);
 				return false;
 			}
 		}
@@ -215,7 +213,7 @@ function movePieces(){
 function getPiece(column, row){
 	var x = (PIECE_PADDING + WIDTH_AND_PADDING * column) + BOARD_MARGIN_LEFT;
 	var y = (PIECE_PADDING + WIDTH_AND_PADDING * row) + BOARD_MARGIN_TOP;
-	var pieces =
+	const pieces =
 	[
 		{
 			id: 1,
@@ -256,10 +254,31 @@ function getPiece(column, row){
 			a: 1,
 			newA: 1,
 			broken: false
-		},
+		}
 	];
-	var rand = Math.floor((Math.random() * pieces.length) + 0);
-	return pieces[rand];
+	const rarePieces = [
+		{
+			id: 5,
+			img: PIECE_IMAGES[4],
+			x,
+			y,
+			newY: y,
+			a: 1,
+			newA: 1,
+			broken: false
+		}
+	];
+
+	var rand1 = Math.floor((Math.random() * 64) + 0);
+	if (rand1 == 1){
+		var rand2 = Math.floor((Math.random() * rarePieces.length) + 0);
+		return rarePieces[rand2];
+	}
+	else{
+		var rand3 = Math.floor((Math.random() * pieces.length) + 0);
+		return pieces[rand3];
+	}
+	
 }
 
 function shouldBreak(pieceLayout, column, row){
