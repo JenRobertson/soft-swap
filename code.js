@@ -123,7 +123,14 @@ function breakCoins(){
 			if(coinLayout[column][row].broken){
 				coinLayout[column].splice(row, 1);
 				coinLayout[column][COINS_PER_LINE-1] = getCoin(column, COINS_PER_LINE-1);
-				coinLayout[column][COINS_PER_LINE-1].y = c.height + WIDTH_AND_PADDING;
+				//add animation delay
+				let animationDelay = 0;
+				for (i = 1; i < COINS_PER_LINE; i++) {
+					if (coinLayout[column][COINS_PER_LINE-i].y > c.height){//one above is also a new coin
+						animationDelay+=WIDTH_AND_PADDING;
+					}
+				}
+				coinLayout[column][COINS_PER_LINE-1].y = c.height + WIDTH_AND_PADDING + animationDelay;
 			}
 		}
 	}
