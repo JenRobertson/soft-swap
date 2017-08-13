@@ -10,7 +10,6 @@ var PIECE_IMAGES = [
 	document.getElementById("toast"),
 ];
 
-
 //http://editor.method.ac
 
 var ctx, c, pieceLayout, cursorX, cursorY;
@@ -129,11 +128,16 @@ function breakPieces(){
 			if(pieceLayout[column][row].broken){
 				pieceLayout[column].splice(row, 1);
 				pieceLayout[column][PIECES_PER_LINE-1] = getPiece(column, PIECES_PER_LINE-1);
+
 				//add animation delay
 				let animationDelay = 0;
 				for (i = 1; i < PIECES_PER_LINE; i++) {
 					if (pieceLayout[column][PIECES_PER_LINE-i].y > c.height){//one above is also a new piece
 						animationDelay+=WIDTH_AND_PADDING;
+					}
+					//stop super breaks
+					while (shouldBreak(pieceLayout, column, PIECES_PER_LINE-1)){
+						pieceLayout[column][PIECES_PER_LINE-1] = getPiece(column, row);
 					}
 				}
 				pieceLayout[column][PIECES_PER_LINE-1].y = c.height + WIDTH_AND_PADDING + animationDelay;
