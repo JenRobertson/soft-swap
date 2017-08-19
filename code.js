@@ -11,14 +11,16 @@ const BOARD_MARGIN_BOTTOM = 100;
 const BOARD_MARGIN_RIGHT = 100;
 const BOARD_COLOR = '#a996e4';
 
-const ANIMATION_SPEED = 10;
-const FADE_SPEED = 0.05;
+const ANIMATION_SPEED = 15;
+const FADE_SPEED = 0.1;
+const RARE_PIECE_ODDS = 40;
 
 const PIECE_IMAGES = [
 	document.getElementById("mookie"),
 	document.getElementById("chicken"),
 	document.getElementById("alpaca"),
 	document.getElementById("toast"),
+	document.getElementById("star"),
 ];
 
 //http://editor.method.ac
@@ -40,7 +42,7 @@ window.onload = function () {
 	}
 
 	c.onclick = function(){
-		if(isAnimationDone()){
+		if(isMovingDone()){
 			swapPieces();
 		}
 	}
@@ -52,13 +54,15 @@ window.onload = function () {
 function frame(){
 	ctx.clearRect(0, 0, c.width, c.height);
 	drawBoardArea();
-
-	//console.log(isAnimationDone());
 		
-	if(isAnimationDone()){
+
+	
+	if(isMovingDone()){
 		checkForBreaks();
+
 	}
-	if(isAnimationDone()){
+
+	if(isFadingDone()){
 		breakPieces();
 	}
 
@@ -92,17 +96,25 @@ function swapPieces(){
 	var column = Math.round(cursorX/WIDTH_AND_PADDING)-1;
 	var row = Math.round(cursorY/WIDTH_AND_PADDING)-1;
 
-	if (pieceLayout[column] && pieceLayout[column][row]){
+	var bottomPiece = pieceLayout[column][row+1];
+	var topPiece = pieceLayout[column][row];
 
-		var bottomPiece = pieceLayout[column][row+1];
-		var topPiece = pieceLayout[column][row];
+	if(bottomPiece && topPiece){
 
-		if(bottomPiece && topPiece){
-			pieceLayout[column][row]= bottomPiece;
-			pieceLayout[column][row + 1]= topPiece;
+		if(bottomPiece.id == 'row_gem'){
+			powerUp1(column, row+1);
 		}
-		movePieces();
+		else if(topPiece.id == 'row_gem'){
+			powerUp1(column, row);
+		}
+		else{
+		pieceLayout[column][row]= bottomPiece;
+		pieceLayout[column][row + 1]= topPiece;
+		}
+
 	}
+	movePieces();
+
 }
 
 function checkForBreaks(){
@@ -133,14 +145,21 @@ function checkForBreaks(){
 	}
 }
 
-function isAnimationDone(){
+function isMovingDone(){
 	for (column = 0; column < PIECES_PER_LINE; column++) {
 		for (row = 0; row < PIECES_PER_LINE; row++) {
 			if(pieceLayout[column][row].y != pieceLayout[column][row].newY ){
 				return false;
 			}
+		}
+	}
+	return true;
+}
+
+function isFadingDone(){
+	for (column = 0; column < PIECES_PER_LINE; column++) {
+		for (row = 0; row < PIECES_PER_LINE; row++) {
 			if(pieceLayout[column][row].a != pieceLayout[column][row].newA ){
-				// console.log('my a is:' ,pieceLayout[column][row].a);
 				return false;
 			}
 		}
@@ -202,6 +221,21 @@ function breakPieces(){
 	movePieces();
 }
 
+
+function powerUp1(column, row){
+
+	for (i = 0; i < PIECES_PER_LINE; i++) {//break row
+		pieceLayout[i][row].id = 'row_gem';
+		pieceLayout[i][row].img = PIECE_IMAGES[4];
+	}
+
+	for (j = 0; j < PIECES_PER_LINE; j++) {//break column
+		pieceLayout[column][j].id = 'row_gem';
+		pieceLayout[column][j].img = PIECE_IMAGES[4];
+	}
+	
+}
+
 //animates pieces to their new index
 function movePieces(){
 	for (column = 0; column < PIECES_PER_LINE; column++) {
@@ -215,7 +249,7 @@ function movePieces(){
 function getPiece(column, row){
 	var x = (PIECE_PADDING + WIDTH_AND_PADDING * column) + BOARD_MARGIN_LEFT;
 	var y = (PIECE_PADDING + WIDTH_AND_PADDING * row) + BOARD_MARGIN_TOP;
-	var pieces =
+	const pieces =
 	[
 		{
 			id: 1,
@@ -256,10 +290,31 @@ function getPiece(column, row){
 			a: 1,
 			newA: 1,
 			broken: false
-		},
+		}
 	];
-	var rand = Math.floor((Math.random() * pieces.length) + 0);
-	return pieces[rand];
+	const rarePieces = [
+		{
+			id: 'row_gem',
+			img: PIECE_IMAGES[4],
+			x,
+			y,
+			newY: y,
+			a: 1,
+			newA: 1,
+			broken: false
+		}
+	];
+
+	var rand1 = Math.floor((Math.random() * RARE_PIECE_ODDS) + 0);
+	if (rand1 == 1){
+		var rand2 = Math.floor((Math.random() * rarePieces.length) + 0);
+		return rarePieces[rand2];
+	}
+	else{
+		var rand3 = Math.floor((Math.random() * pieces.length) + 0);
+		return pieces[rand3];
+	}
+	
 }
 
 function shouldBreak(pieceLayout, column, row){
