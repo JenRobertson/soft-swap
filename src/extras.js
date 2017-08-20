@@ -4,6 +4,7 @@ function drawExtras(){
 	}
 }
 
+//move the extras frame up by one
 function updateExtras(){
 	for (i = 0; i < extras.length; i++) {
 		extras[i].frame++;

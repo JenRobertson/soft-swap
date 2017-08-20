@@ -74,7 +74,9 @@ function frame(){
 	drawExtras();
 	drawSelector();
 	drawScore();
+
 	hideStuffOffTheEdge();
+		drawTitle();
 
 	tickCount++;
 

@@ -64,7 +64,9 @@ function breakPieces(){
 	for (column = 0; column < PIECES_PER_LINE; column++) {
 		for (row = 0; row < PIECES_PER_LINE; row++) {
 			if(pieceLayout[column][row].broken){
+
 				extras.push({column,row,frame:0});
+				
 				pieceLayout[column].splice(row, 1);
 				pieceLayout[column][PIECES_PER_LINE-1] = getPiece(column, PIECES_PER_LINE-1);
 

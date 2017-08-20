@@ -11,8 +11,18 @@ function hideStuffOffTheEdge(){
 
 function drawScore(){
 	ctx.font = "30px Arial";
-	ctx.fillText('Score: ' + score,BOARD_MARGIN_LEFT,50);
+	ctx.fillText('Score: ' + score,BOARD_MARGIN_LEFT,80);
 }
+
+function drawTitle(){
+  ctx.font = "50px Arial";
+  ctx.fillText('Soft Swap',BOARD_MARGIN_LEFT + 270,70);
+  // ctx.strokeStyle='red';
+  // ctx.strokeText('Soft Swap',BOARD_MARGIN_LEFT + 250,70);
+  ctx.font = "20px Arial";
+  ctx.fillText('By Jenny Robertson',BOARD_MARGIN_LEFT, BOARD_HEIGHT + BOARD_MARGIN_TOP + 60);
+}
+
 
 CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
   if (w < 2 * r) r = w / 2;

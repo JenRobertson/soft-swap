@@ -21,12 +21,13 @@ function swapPieces(){
 			bottomPiece.effect(column, row+1);
 		}
 		else if (topPiece.effect){
-			topPiece.effect(column, row+1);
+			topPiece.effect(column, row);
 		}
 		else {
 			pieceLayout[column][row]= bottomPiece;
 			pieceLayout[column][row + 1]= topPiece;
 			movePieces();
+			console.log('swap');
 		}
 	}
 }
