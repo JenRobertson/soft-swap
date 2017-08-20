@@ -15,17 +15,24 @@ const ANIMATION_SPEED = 15;
 const FADE_SPEED = 0.1;
 const RARE_PIECE_ODDS = 40;
 
+var frameNum = 0;
+var tickCount = 0;
+const tickSpeed = 2;
+
 const PIECE_IMAGES = [
 	document.getElementById("mookie"),
 	document.getElementById("chicken"),
 	document.getElementById("alpaca"),
 	document.getElementById("toast"),
 	document.getElementById("star"),
+	document.getElementById("bomb")
 ];
+
+const shineSprite = document.getElementById("shineSprite");
 
 //http://editor.method.ac
 
-var ctx, c, pieceLayout, cursorX, cursorY;
+var ctx, c, pieceLayout, cursorX, cursorY, extras = [];
 var score = 0;
 
 window.onload = function () {
@@ -55,11 +62,8 @@ function frame(){
 	ctx.clearRect(0, 0, c.width, c.height);
 	drawBoardArea();
 		
-
-	
 	if(isMovingDone()){
 		checkForBreaks();
-
 	}
 
 	if(isFadingDone()){
@@ -67,14 +71,25 @@ function frame(){
 	}
 
 	drawPieces();
+	drawExtras();
 	drawSelector();
 	drawScore();
 	hideStuffOffTheEdge();
 
+	tickCount++;
 
+	//count slowly
+	if(tickCount > tickSpeed){
+		tickCount == 0;
+	}
+	if(tickCount === tickSpeed){
+		tickCount = 0;
+		updateExtras();
+	}
 	window.requestAnimationFrame(frame);
 }
-	
+
+
 function generatePiecesArray(){
 	var pieceLayout = new Array(PIECES_PER_LINE);//columns
 
@@ -101,20 +116,18 @@ function swapPieces(){
 
 	if(bottomPiece && topPiece){
 
-		if(bottomPiece.id == 'row_gem'){
-			powerUp1(column, row+1);
+		if (bottomPiece.effect){
+			bottomPiece.effect(column, row+1);
 		}
-		else if(topPiece.id == 'row_gem'){
-			powerUp1(column, row);
+		else if (topPiece.effect){
+			topPiece.effect(column, row+1);
 		}
-		else{
-		pieceLayout[column][row]= bottomPiece;
-		pieceLayout[column][row + 1]= topPiece;
+		else {
+			pieceLayout[column][row]= bottomPiece;
+			pieceLayout[column][row + 1]= topPiece;
+			movePieces();
 		}
-
 	}
-	movePieces();
-
 }
 
 function checkForBreaks(){
@@ -196,10 +209,23 @@ function drawPieces(){
 	}
 }
 
+function drawExtras(){
+	for (i = 0; i < extras.length; i++) {
+		drawShine(extras[i]);
+	}
+}
+
+function updateExtras(){
+	for (i = 0; i < extras.length; i++) {
+		extras[i].frame++;
+	}
+}
+
 function breakPieces(){
 	for (column = 0; column < PIECES_PER_LINE; column++) {
 		for (row = 0; row < PIECES_PER_LINE; row++) {
 			if(pieceLayout[column][row].broken){
+				extras.push({column,row,frame:0});
 				pieceLayout[column].splice(row, 1);
 				pieceLayout[column][PIECES_PER_LINE-1] = getPiece(column, PIECES_PER_LINE-1);
 
@@ -232,6 +258,20 @@ function powerUp1(column, row){
 	for (j = 0; j < PIECES_PER_LINE; j++) {//break column
 		pieceLayout[column][j].id = 'row_gem';
 		pieceLayout[column][j].img = PIECE_IMAGES[4];
+	}
+	
+}
+
+function powerUpBomb(column, row){
+	//break ones around it
+
+	for (col = column - 1; col <= column + 1; col++) {
+		for (ro = row - 1; ro <= row + 1; ro++) {
+			if(pieceLayout[col] && pieceLayout[col][ro]){
+				pieceLayout[col][ro].id = 'row_gem';
+				pieceLayout[col][ro].img = PIECE_IMAGES[5];
+			}
+		}
 	}
 	
 }
@@ -301,7 +341,19 @@ function getPiece(column, row){
 			newY: y,
 			a: 1,
 			newA: 1,
-			broken: false
+			broken: false,
+			effect: powerUp1
+		},
+		{
+			id: 'bomb',
+			img: PIECE_IMAGES[5],
+			x,
+			y,
+			newY: y,
+			a: 1,
+			newA: 1,
+			broken: false,
+			effect: powerUpBomb
 		}
 	];
 
@@ -372,6 +424,10 @@ function drawPiece(piece){
 	ctx.globalAlpha = piece.a;
 	ctx.drawImage(piece.img, piece.x, piece.y, PIECE_WIDTH, PIECE_WIDTH);
 	ctx.globalAlpha = 1;
+}
+
+function drawShine(item){
+	ctx.drawImage(shineSprite, (item.frame * 223), 0, 233, 233, 10 + (WIDTH_AND_PADDING * item.column), 10 + (WIDTH_AND_PADDING * item.row), 300, 300);
 }
 
 function drawBoardArea(){
