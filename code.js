@@ -62,11 +62,8 @@ function frame(){
 	ctx.clearRect(0, 0, c.width, c.height);
 	drawBoardArea();
 		
-
-	
 	if(isMovingDone()){
 		checkForBreaks();
-
 	}
 
 	if(isFadingDone()){
@@ -89,14 +86,9 @@ function frame(){
 		tickCount = 0;
 		updateExtras();
 	}
-
-
 	window.requestAnimationFrame(frame);
 }
 
-function drawShine(item){
-	ctx.drawImage(shineSprite, (item.frame * 223), 0, 233, 233, 10 + (WIDTH_AND_PADDING * item.column), 10 + (WIDTH_AND_PADDING * item.row), 300, 300);
-}
 
 function generatePiecesArray(){
 	var pieceLayout = new Array(PIECES_PER_LINE);//columns
@@ -234,8 +226,6 @@ function breakPieces(){
 		for (row = 0; row < PIECES_PER_LINE; row++) {
 			if(pieceLayout[column][row].broken){
 				extras.push({column,row,frame:0});
-				console.log(column, row);
-
 				pieceLayout[column].splice(row, 1);
 				pieceLayout[column][PIECES_PER_LINE-1] = getPiece(column, PIECES_PER_LINE-1);
 
@@ -285,7 +275,6 @@ function powerUpBomb(column, row){
 	}
 	
 }
-
 
 //animates pieces to their new index
 function movePieces(){
@@ -435,6 +424,10 @@ function drawPiece(piece){
 	ctx.globalAlpha = piece.a;
 	ctx.drawImage(piece.img, piece.x, piece.y, PIECE_WIDTH, PIECE_WIDTH);
 	ctx.globalAlpha = 1;
+}
+
+function drawShine(item){
+	ctx.drawImage(shineSprite, (item.frame * 223), 0, 233, 233, 10 + (WIDTH_AND_PADDING * item.column), 10 + (WIDTH_AND_PADDING * item.row), 300, 300);
 }
 
 function drawBoardArea(){
